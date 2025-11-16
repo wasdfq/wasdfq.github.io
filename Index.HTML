@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>สุ่มเวลา (0-24) — แบบ 2 แบบ</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans',Arial;}
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f4f6fb;margin:0;padding:20px}
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(20,30,50,0.08);padding:28px;max-width:520px;width:100%}
+    h1{margin:0 0 6px;font-size:20px}
+    p.lead{margin:0 0 18px;color:#555}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    button{flex:1;padding:10px 14px;border-radius:8px;border:0;background:#65a3ff;color:#fff;font-weight:600;cursor:pointer}
+    button.secondary{background:#65a3ff;color:#ffffff}
+    .out{background:#f7f9ff;border-radius:8px;padding:16px;font-family:monospace;font-size:18px;display:flex;justify-content:space-between;align-items:center}
+    .muted{color:#777;font-size:13px}
+    .small{font-size:13px}
+    .actions{display:flex;gap:8px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>สุ่มเวลา (0–24 ชั่วโมง)</h1>
+    <p class="lead">นับนาทีเป็นที่ละ 5 ไปเลื่อยๆ มี2แบบ</p>
+
+    <div class="row">
+      <button id="singleBtn">สุ่มแค่1ช่วงเวลา</button>
+      <button id="rangeBtn" class="secondary">สุ่ม2ช่วงเวลา </button>
+    </div>
+
+    <div class="out" id="output">
+      <div>
+        <div class="muted small">ผลลัพธ์</div>
+        <div id="result" style="font-size:20px;font-weight:700;">—</div>
+      </div>
+      <div class="actions">
+        <button id="regenBtn" class="secondary" style="padding:6px 10px;font-size:14px;">สุ่มใหม่</button>
+      </div>
+    </div>
+
+    <p class="small muted" style="margin-top:12px">หมายเหตุ: ทำมาเล่นๆ บัคเยอะนะจ่ะ </p>
+  </main>
+
+  <script>
+
+    const minuteSteps = [0,5,10,15,20,25,30,35,40,45,50,55];
+    const totalSlots = 24 * minuteSteps.length;
+
+    function pad(n){ return n.toString().padStart(2,'0'); }
+
+
+    function randSlot(){
+      return Math.floor(Math.random() * totalSlots);
+    }
+
+
+    function slotToTime(slot){
+      const minutesPerHour = minuteSteps.length; //12
+      const hour = Math.floor(slot / minutesPerHour);
+      const minuteIndex = slot % minutesPerHour;
+      const minute = minuteSteps[minuteIndex];
+      return `${pad(hour)}:${pad(minute)}`;
+    }
+
+    function randomSingle(){
+      const s = randSlot();
+      return slotToTime(s);
+    }
+
+   
+    function randomRange(){
+      const a = randSlot();
+      const b = randSlot();
+      const start = Math.min(a,b);
+      const end = Math.max(a,b);
+      return `${slotToTime(start)} - ${slotToTime(end)}`;
+    }
+
+
+    const singleBtn = document.getElementById('singleBtn');
+    const rangeBtn = document.getElementById('rangeBtn');
+    const resultEl = document.getElementById('result');
+    const regenBtn = document.getElementById('regenBtn');
+
+  
+    let lastMode = null;
+    let lastValue = null;
+
+    singleBtn.addEventListener('click', ()=>{
+      lastMode = 'single';
+      lastValue = randomSingle();
+      resultEl.textContent = lastValue;
+    });
+
+    rangeBtn.addEventListener('click', ()=>{
+      lastMode = 'range';
+      lastValue = randomRange();
+      resultEl.textContent = lastValue;
+    });
+
+    regenBtn.addEventListener('click', ()=>{
+      if(lastMode === 'single'){
+        lastValue = randomSingle();
+      } else if(lastMode === 'range'){
+        lastValue = randomRange();
+      } else {
+        lastMode = 'single';
+        lastValue = randomSingle();
+      }
+      resultEl.textContent = lastValue;
+    });
+
+    
+
+    lastMode = 'single';
+    lastValue = randomSingle();
+    resultEl.textContent = lastValue;
+  </script>
+</body>
+</html>
